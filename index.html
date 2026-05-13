@@ -65,11 +65,6 @@ min-height: 180px;
 margin-top: 25px;
 box-sizing: border-box;
 }
-.placeholder-text {
-color: #999;
-text-align: center;
-margin-top: 60px;
-}
 .input-group {
 display: flex;
 margin-top: 15px;
@@ -91,20 +86,16 @@ border-radius: 6px;
 font-weight: bold;
 cursor: pointer;
 }
+.action-btn:disabled {
+background-color: #aaa;
+cursor: not-allowed;
+}
 .result-box {
 margin-top: 15px;
 padding: 12px;
 border-radius: 6px;
 background-color: #f1f8e9;
 border-left: 4px solid #7cb342;
-}
-.insight-box {
-margin-top: 10px;
-padding: 10px;
-border-radius: 6px;
-background-color: #e3f2fd;
-border-left: 4px solid #1e88e5;
-font-size: 14px;
 }
 .metrics-grid {
 display: grid;
@@ -117,25 +108,30 @@ text-align: center;
 padding: 12px 5px;
 border-radius: 8px;
 }
+.loading-text {
+color: #e65100;
+font-weight: bold;
+margin-top: 10px;
+font-size: 14px;
+}
 </style>
 </head>
 <body>
 
 <div class="container">
 <h1>🌱 Smart Rescue</h1>
-<div class="subtitle">AI Food Waste Advisor Panel Prototype</div>
+<div class="subtitle">Live LLM AI Food Waste Advisor Prototype</div>
 
 <div class="menu-title">Select a Demo Feature to Pitch:</div>
-<button class="btn" onclick="showRescue()">🚨 1. Emergency Ingredient Rescue</button>
-<button class="btn" onclick="showRecipe()">🍳 2. Zero-Waste Recipe Generator</button>
+<button class="btn" onclick="showRescue()">🚨 1. Live AI Ingredient Rescue (Unscripted)</button>
+<button class="btn" onclick="showRecipe()">🍳 2. Zero-Waste Recipe Engine</button>
 <button class="btn" onclick="showMetrics()">📉 3. Live Impact Metrics</button>
 
 <div id="display">
-<div class="placeholder-text">Click a button above to run the live interaction screen.</div>
+<div style="color: #999; text-align: center; margin-top: 60px;">Click a button above to run the live interaction screen.</div>
 </div>
 </div>
 
-<!-- Connects the JavaScript logic file -->
 <script src="script.js"></script>
 
 </body>
