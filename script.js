@@ -3,43 +3,54 @@ const display = document.getElementById('display');
 
 function showRescue() {
 display.innerHTML = `
-<h3 style="margin-top:0; color:#2e7d32;">🚨 Emergency Ingredient Rescue</h3>
-<p style="font-size:14px; color:#555;">Type a fragile grocery item to simulate instant AI recovery advice.</p>
+<h3 style="margin-top:0; color:#2e7d32;">🚨 Live AI Ingredient Rescue</h3>
+<p style="font-size:14px; color:#555;">Type <b>any</b> tricky food (like 'egg', 'raw steak', or 'stale cake') to test the unscripted neural network.</p>
 <div class="input-group">
-<input type="text" id="foodInput" placeholder="Try: banana, lettuce, or milk...">
-<button class="action-btn" onclick="processRescue()">Rescue</button>
+<input type="text" id="foodInput" placeholder="Enter ingredient...">
+<button class="action-btn" id="rescueBtn" onclick="processLiveAI()">Ask AI</button>
 </div>
 <div id="rescueOutput"></div>
 `;
 }
 
-function processRescue() {
-const item = document.getElementById('foodInput').value.toLowerCase().trim();
+async function processLiveAI() {
+const item = document.getElementById('foodInput').value.trim();
 const output = document.getElementById('rescueOutput');
+const button = document.getElementById('rescueBtn');
 
 if (!item) {
-output.innerHTML = "<p style='color:red; font-size:14px; margin-top:10px;'>Please type an item first.</p>";
+output.innerHTML = "<p style='color:red; font-size:14px; margin-top:10px;'>Please enter a food item.</p>";
 return;
 }
 
-let action = `Chop, blanch, and flash-freeze your <b>${item}</b> to halt cell breakdown and preserve raw nutrients.`;
-let insight = "Moving items strictly to a visible 'First In, First Out' designated shelf space reduces immediate consumer waste by 30%.";
+button.disabled = true;
+output.innerHTML = "<p class='loading-text'>🔄 AI is analyzing food properties and calculating storage variables...</p>";
 
-if (item.includes('banana')) {
-action = "Peel and freeze brown bananas immediately to use later in morning smoothies or baked banana bread.";
-insight = "Bananas generate high volumes of ethylene gas. Keep them isolated to protect nearby sensitive produce from rotting.";
-} else if (item.includes('lettuce') || item.includes('green') || item.includes('spinach')) {
-action = "Submerge wilted leaves completely in a bowl of ice water for 10 minutes, dry thoroughly, and store with a fresh paper towel.";
-insight = "Controlled hydration forces pure water back into cell gaps, completely restoring optimal crispness and leaf turgor pressure.";
-} else if (item.includes('milk') || item.includes('dairy')) {
-action = "Pour excess liquid milk directly into ice cube trays for coffee use, or save turning milk to activate fluffy pancake batters.";
-insight = "Standard commercial 'Best By' dates dictate baseline manufacturing quality parameters, not safety timelines.";
-}
+try {
+// We use an open-source text generation model hosted on Hugging Face's serverless API
+const response = await fetch("huggingface.co", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({
+inputs: `<|system|>\nYou are an expert culinary scientist specializing in food waste prevention. Give a concise, 2-sentence kitchen hack to safely preserve or use the specific item entered. Do not genericize or suggest chopping/blanching foods where it doesn't make sense (like liquid eggs or hard cheese). Keep it short and actionable.</s>\n<|user|>\nHow do I preserve or rescue this expiring ingredient: ${item}</s>\n<|assistant|>\n`,
+parameters: { max_new_tokens: 100, temperature: 0.4 }
+})
+});
+
+const data = await response.json();
+let aiText = data[0].generated_text.split("<|assistant|>")[1] || "Store in airtight containers or freeze if applicable.";
 
 output.innerHTML = `
-<div class="result-box"><b>AI Action:</b> ${action}</div>
-<div class="insight-box"><b>Data Insight:</b> ${insight}</div>
+<div class="result-box">
+<b>🤖 Live AI Response:</b><br>
+${aiText.trim()}
+</div>
 `;
+} catch (error) {
+output.innerHTML = "<p style='color:red;'>API Error or Rate Limit reached. Please try again in a moment.</p>";
+} finally {
+button.disabled = false;
+}
 }
 
 function showRecipe() {
