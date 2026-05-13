@@ -4,7 +4,7 @@ const display = document.getElementById('display');
 function showRescue() {
 display.innerHTML = `
 <h3 style="margin-top:0; color:#2e7d32;">🚨 Live AI Ingredient Rescue</h3>
-<p style="font-size:14px; color:#555;">Type <b>any</b> item (like 'egg', 'leftover steak', or 'iPad') to prove the AI isn't using scripted lines.</p>
+<p style="font-size:14px; color:#555;">Type <b>any</b> item (like 'egg', 'iPad', 'steak', or 'milk') to prove the system handles unscripted inputs.</p>
 <div class="input-group">
 <input type="text" id="foodInput" placeholder="Enter item here...">
 <button class="action-btn" id="rescueBtn" onclick="processLiveAI()">Ask AI</button>
@@ -14,7 +14,7 @@ display.innerHTML = `
 }
 
 async function processLiveAI() {
-const item = document.getElementById('foodInput').value.toLowerCase().trim();
+const item = document.getElementById('foodInput').value.trim();
 const output = document.getElementById('rescueOutput');
 const button = document.getElementById('rescueBtn');
 
@@ -23,62 +23,33 @@ output.innerHTML = "<p style='color:red; font-size:14px; margin-top:10px;'>Pleas
 return;
 }
 
-// This immediately inserts the orange text on screen execution
 button.disabled = true;
-output.innerHTML = "<p class='loading-text'>🔄 Connecting to cloud LLM neural network... calculating unique storage properties...</p>";
+output.innerHTML = "<p class='loading-text'>🔄 Orange Loader Active: Connecting to Cloud Llama-3 AI Engine...</p>";
 
-// Smart fallback safety rules so it handles non-food instantly without API lag
-if (item.includes("ipad") || item.includes("phone") || item.includes("tablet") || item.includes("computer")) {
-setTimeout(() => {
-output.innerHTML = `
-<div class="result-box" style="border-left: 4px solid #d32f2f; background-color: #ffebee;">
-<b>🤖 Dynamic AI Assessment:</b><br>
-An electronic device cannot be processed using food preservation methods. To preserve its hardware lifespan, maintain its lithium battery charge cycles between 20% and 80%, protect the motherboard from moisture, and recycle it at an authorized e-waste facility if it breaks.
-</div>`;
-button.disabled = false;
-}, 1200);
-return;
-}
+// Build a strict prompt forcing culinary accuracy for bizarre objects
+const systemPrompt = "You are a food waste expert. Give exactly 2 sentences of highly specific advice for dealing with the expiring item input by the user. If the item is not a food (like a machine, vehicle, or electronics like an iPad), explicitly state it cannot be preserved using food methods, then mention its real preservation logic briefly. Be completely literal. Do not mention cooking, chopping, or blanching items where it makes no physical sense.";
+const userPrompt = `How do I preserve or rescue this expiring item: ${item}`;
 
-if (item.includes("egg")) {
-setTimeout(() => {
-output.innerHTML = `
-<div class="result-box">
-<b>🤖 Dynamic AI Assessment:</b><br>
-Do not attempt to chop or blanch raw liquid eggs. To rescue expiring eggs, crack them into a container, whisk them thoroughly with a tiny pinch of salt to protect the proteins, and freeze them in sealed bags or silicone ice cube trays for up to 1 year.
-</div>`;
-button.disabled = false;
-}, 1200);
-return;
-}
+// Construct the fully public, unauthenticated text generation API URL
+const encodedPrompt = encodeURIComponent(`${systemPrompt}\n\nUser: ${userPrompt}`);
+const apiUrl = `pollinations.ai{encodedPrompt}?model=llama&json=false`;
 
-// For other ingredients, it uses a real cloud text pipeline endpoint
 try {
-const response = await fetch("huggingface.co", {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify({
-inputs: `You are a food waste expert. Give a brief 2-sentence advice for dealing with expiring ${item}. Keep it realistic to its physical form. Do not suggest chopping if it is liquid.`,
-parameters: { max_new_tokens: 60 }
-})
-});
+const response = await fetch(apiUrl);
+if (!response.ok) throw new Error("API Failure");
 
-const data = await response.json();
-let aiText = data[0]?.generated_text || data.generated_text || `Flash freeze or store your ${item} in an airtight container immediately.`;
-
-// Clean text formatting
-aiText = aiText.replace(/[^a-zA-Z0-9\s.,!?'"()]/g, "").trim();
+const aiText = await response.text();
 
 output.innerHTML = `
 <div class="result-box">
-<b>🤖 Live AI Assessment:</b><br>
-${aiText}
+<b>🤖 Verified Live AI Assessment:</b><br>
+${aiText.trim()}
 </div>`;
 } catch (error) {
 output.innerHTML = `
-<div class="result-box">
-<b>🤖 Dynamic AI Assessment:</b><br>
-Flash freeze your leftover ${item} immediately in an airtight container to halt structural aging and lock in core nutrients. Move it to your refrigerator's designated 'First In, First Out' high-visibility zone.
+<div class="result-box" style="border-left: 4px solid #d32f2f; background-color: #ffebee;">
+<b>⚠️ Network Error:</b><br>
+Could not connect to the cloud neural network. Please check your iPad internet connection and try again.
 </div>`;
 } finally {
 button.disabled = false;
@@ -109,5 +80,6 @@ display.innerHTML = `
 </div>
 <p style="font-size:12px; color:#777; margin-top:15px; line-height:1.3; background:#fff3e0; padding:8px; border-radius:4px;">
 💡 <b>Pitch Delivery Note:</b> Highlight to judges that converting physical mass weight directly into standardized carbon metrics enables this application layout to hook seamlessly into corporate carbon validation engines.
-</p>`;
+</p>
+`;
 }
